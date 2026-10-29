@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SPECTRA LAB — DIY Spectroscope &amp; Light Spectrum Analyser</title>
+  <meta name="description" content="Upload and analyse photographs taken through a homemade CD/DVD spectroscope. Measure brightness profiles, compare light sources, and learn the physics behind spectral analysis." />
+  <meta name="theme-color" content="#0a0d14" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     APP SHELL
+═══════════════════════════════════════════════ -->
+<div class="app-shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
+    <div class="sidebar-header">
+      <div class="wordmark">
+        <div class="wordmark-icon">
+          <!-- Prism icon -->
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L2 19h20L12 2z" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" fill="none"/>
+            <path d="M12 2L22 19" stroke="url(#sg1)" stroke-width="1.8"/>
+            <defs>
+              <linearGradient id="sg1" x1="12" y1="2" x2="22" y2="19" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#8b5cf6"/>
+                <stop offset="1" stop-color="#22d3ee"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="wordmark-text">
+          <div class="wordmark-title">SPECTRA LAB</div>
+          <div class="wordmark-sub">Spectrum Analyser</div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+
+      <button class="nav-item active" data-view="overview" id="nav-overview">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Overview
+      </button>
+
+      <button class="nav-item" data-view="analysis" id="nav-analysis">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Spectrum Analysis
+      </button>
+
+      <button class="nav-item" data-view="compare" id="nav-compare">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Compare Spectra
+      </button>
+
+      <button class="nav-item" data-view="results" id="nav-results">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Results &amp; Export
+      </button>
+
+      <div class="nav-section-label" style="margin-top:8px;">Learn</div>
+
+      <button class="nav-item" data-view="physics" id="nav-physics">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Physics &amp; Theory
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div>Engineering Physics Lab</div>
+      <div>First Year B.Tech</div>
+      <div style="margin-top:4px;color:var(--text-accent)">All processing is local</div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="hamburger btn-ghost btn-icon" id="hamburgerBtn" aria-label="Toggle menu">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <span class="page-title" id="pageTitle">Overview</span>
+        <span class="page-badge" id="pageBadge">DIY Spectroscope</span>
+      </div>
+      <div class="topbar-right">
+        <button class="btn btn-sm btn-secondary" id="demoBtn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Load Demo Data
+        </button>
+      </div>
+    </header>
+
+    <!-- PAGE CONTENT -->
+    <main class="page-content" id="mainContent">
+
+      <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░
+           VIEW: OVERVIEW
+      ░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+      <section class="view active" id="view-overview">
+
+        <div class="spectrum-bar" style="margin-bottom:24px;"></div>
+
+        <div class="overview-hero">
+          <div class="hero-text">
+            <div class="hero-badge">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+              Engineering Physics Lab Project
+            </div>
+            <h1 class="hero-title">SPECTRA LAB</h1>
+            <p class="hero-desc">
+              Analyse light spectra from your homemade CD/DVD spectroscope. Upload a photograph,
+              select the spectral band, and instantly see RGB channel profiles, brightness curves,
+              and automated observations — all processed locally in your browser.
+            </p>
+            <div class="hero-actions">
+              <button class="btn btn-primary btn-lg" id="startAnalysisBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                Start Analysis
+              </button>
+              <button class="btn btn-secondary btn-lg" id="exploreBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Explore Demo
+              </button>
+            </div>
+          </div>
+
+          <div class="hero-visual">
+            <div style="font-size:0.68rem;color:var(--text-muted);letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px;">How a CD disperses white light</div>
+            <!-- SVG Prism / Diffraction visual -->
+            <div class="prism-display">
+              <svg class="prism-svg" viewBox="0 0 340 180" xmlns="http://www.w3.org/2000/svg">
+                <!-- White light ray -->
+                <line x1="10" y1="90" x2="100" y2="90" stroke="rgba(255,255,255,0.8)" stroke-width="3"/>
+                <text x="5" y="82" fill="rgba(255,255,255,0.5)" font-size="8" font-family="Inter">White</text>
+                <text x="5" y="91" fill="rgba(255,255,255,0.5)" font-size="8" font-family="Inter">Light</text>
+
+                <!-- CD body -->
+                <ellipse cx="130" cy="90" rx="30" ry="50" fill="none" stroke="rgba(139,92,246,0.6)" stroke-width="1.5" stroke-dasharray="4,3"/>
+                <ellipse cx="130" cy="90" rx="30" ry="50" fill="rgba(139,92,246,0.05)"/>
+                <text x="112" y="94" fill="rgba(139,92,246,0.8)" font-size="9" font-family="Inter">CD/DVD</text>
+                <text x="108" y="104" fill="rgba(139,92,246,0.6)" font-size="7" font-family="Inter">Diffraction</text>
+                <text x="113" y="112" fill="rgba(139,92,246,0.6)" font-size="7" font-family="Inter">Grating</text>
+
+                <!-- Dispersed rays -->
+                <line x1="160" y1="60" x2="330" y2="15"  stroke="#7c3aed" stroke-width="2" opacity="0.9"/>
+                <line x1="160" y1="68" x2="330" y2="40"  stroke="#2563eb" stroke-width="2" opacity="0.9"/>
+                <line x1="160" y1="76" x2="330" y2="65"  stroke="#0891b2" stroke-width="2" opacity="0.9"/>
+                <line x1="160" y1="84" x2="330" y2="88"  stroke="#059669" stroke-width="2" opacity="0.9"/>
+                <line x1="160" y1="92" x2="330" y2="112" stroke="#d97706" stroke-width="2" opacity="0.9"/>
+                <line x1="160" y1="100" x2="330" y2="136" stroke="#ea580c" stroke-width="2" opacity="0.9"/>
+                <line x1="160" y1="108" x2="330" y2="160" stroke="#dc2626" stroke-width="2" opacity="0.9"/>
+
+                <!-- Wavelength labels -->
+                <text x="332" y="19"  fill="#7c3aed" font-size="7" font-family="JetBrains Mono">~400nm</text>
+                <text x="332" y="44"  fill="#2563eb" font-size="7" font-family="JetBrains Mono">~450nm</text>
+                <text x="332" y="69"  fill="#0891b2" font-size="7" font-family="JetBrains Mono">~490nm</text>
+                <text x="332" y="92"  fill="#059669" font-size="7" font-family="JetBrains Mono">~530nm</text>
+                <text x="332" y="116" fill="#d97706" font-size="7" font-family="JetBrains Mono">~580nm</text>
+                <text x="332" y="140" fill="#ea580c" font-size="7" font-family="JetBrains Mono">~620nm</text>
+                <text x="332" y="164" fill="#dc2626" font-size="7" font-family="JetBrains Mono">~700nm</text>
+              </svg>
+            </div>
+            <div class="spectrum-bar-thick"></div>
+          </div>
+        </div>
+
+        <!-- Workflow steps -->
+        <h2 class="section-title">How it works</h2>
+        <p class="section-desc">Three simple steps from capturing light to understanding spectra.</p>
+
+        <div class="workflow-steps">
+          <div class="workflow-step">
+            <div class="workflow-step-num">Step 01</div>
+            <div class="workflow-step-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+            </div>
+            <div class="workflow-step-title">Capture Light</div>
+            <div class="workflow-step-desc">Shine the light source into your homemade spectroscope and photograph the rainbow spectrum formed on the CD grating.</div>
+            <span class="step-arrow">→</span>
+          </div>
+
+          <div class="workflow-step">
+            <div class="workflow-step-num">Step 02</div>
+            <div class="workflow-step-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            </div>
+            <div class="workflow-step-title">Upload Image</div>
+            <div class="workflow-step-desc">Upload your photograph and use the selection tool to isolate the horizontal spectral band from the rest of the image.</div>
+            <span class="step-arrow">→</span>
+          </div>
+
+          <div class="workflow-step">
+            <div class="workflow-step-num">Step 03</div>
+            <div class="workflow-step-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+            <div class="workflow-step-title">Analyse Spectrum</div>
+            <div class="workflow-step-desc">The app reads every pixel column, calculates RGB intensities and relative brightness, detects peaks, and plots the results.</div>
+          </div>
+        </div>
+
+        <!-- Features -->
+        <h2 class="section-title">Features</h2>
+        <div class="feature-grid">
+          <div class="feature-item">
+            <div class="feature-icon fi-violet">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+            <div class="feature-content">
+              <div class="feature-title">Real Pixel Analysis</div>
+              <div class="feature-desc">Genuine image processing using the HTML Canvas API. No hardcoded data — every result comes from your actual photograph.</div>
+            </div>
+          </div>
+
+          <div class="feature-item">
+            <div class="feature-icon fi-cyan">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            </div>
+            <div class="feature-content">
+              <div class="feature-title">Interactive Charts</div>
+              <div class="feature-desc">Brightness profile and RGB channel charts with zoom, pan, tooltips, and one-click PNG download via Chart.js.</div>
+            </div>
+          </div>
+
+          <div class="feature-item">
+            <div class="feature-icon fi-emerald">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="feature-content">
+              <div class="feature-title">Source Comparison</div>
+              <div class="feature-desc">Upload two photographs and overlay their brightness profiles to compare LED, CFL, fluorescent, or any other source.</div>
+            </div>
+          </div>
+
+          <div class="feature-item">
+            <div class="feature-icon fi-amber">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div class="feature-content">
+              <div class="feature-title">CSV &amp; Chart Export</div>
+              <div class="feature-desc">Download raw pixel data as CSV and charts as PNG. Print a professional lab report directly from the browser.</div>
+            </div>
+          </div>
+
+
+          <div class="feature-item">
+            <div class="feature-icon fi-cyan">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            </div>
+            <div class="feature-content">
+              <div class="feature-title">100% Local &amp; Private</div>
+              <div class="feature-desc">All image processing happens in your browser. Your photographs are never uploaded to any server.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- How it works deep -->
+        <div class="how-it-works">
+          <div class="hiw-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            The Physical Spectroscope &amp; Digital Analysis
+          </div>
+          <div class="hiw-grid">
+            <div>
+              <div class="hiw-col-title">🔬 Physical Spectroscope</div>
+              <p class="hiw-text">
+                Your spectroscope is built from a cardboard tube (or box) with a narrow entrance slit at one end
+                and an old CD/DVD at the other. The microscopic grooves on the CD surface act as a diffraction
+                grating — they split incoming white light into its component wavelengths by constructive and
+                destructive interference. Different wavelengths exit at slightly different angles, spreading the
+                light into a rainbow (spectrum). Each colour corresponds to a particular wavelength range:
+                violet (~400 nm) bends the most, red (~700 nm) the least.
+              </p>
+            </div>
+            <div>
+              <div class="hiw-col-title">💻 Digital Image Analysis</div>
+              <p class="hiw-text">
+                When you photograph the spectrum and upload the image here, the app reads every pixel of the
+                selected region using the HTML Canvas API. For each vertical column of pixels, it averages the
+                red, green, and blue channel values across the selected height. It then computes a relative
+                brightness value using the standard luminance formula
+                <em>Y = 0.2126R + 0.7152G + 0.0722B</em> (ITU-R BT.709). This brightness profile is
+                normalised to 0–100 and plotted against horizontal pixel position. Peaks in this profile
+                correspond to regions of the spectrum where your light source emits more intensely — but
+                remember, the image is affected by camera response, exposure, and optical geometry.
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </section><!-- /view-overview -->
+
+
+      <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░
+           VIEW: SPECTRUM ANALYSIS
+      ░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+      <section class="view" id="view-analysis">
+
+        <div class="spectrum-bar" style="margin-bottom:20px;"></div>
+
+        <!-- Demo banner -->
+        <div class="demo-banner" id="demoBannerAnalysis">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <strong>ILLUSTRATIVE DEMO DATA — NOT A REAL EXPERIMENTAL MEASUREMENT.</strong>
+          &nbsp; This is a synthetic example to demonstrate the interface.
+          <button class="btn btn-sm btn-ghost" id="exitDemoBtn" style="margin-left:auto;">Exit Demo</button>
+        </div>
+
+        <h2 class="section-title">Spectrum Analysis</h2>
+        <p class="section-desc">Upload a photograph taken through your spectroscope, select the spectral region, then click Analyse.</p>
+
+        <!-- Upload zone -->
+        <div class="card" style="margin-bottom:18px;" id="uploadCard">
+          <div class="card-header">
+            <div class="card-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              Image Upload
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <span class="badge badge-violet" id="uploadStatus">No image</span>
+              <label for="fileInput" class="btn btn-sm btn-secondary" style="cursor:pointer;">Browse</label>
+              <input type="file" id="fileInput" accept=".jpg,.jpeg,.png" />
+            </div>
+          </div>
+
+          <div id="uploadError" style="display:none;"></div>
+
+          <!-- Drop zone -->
+          <div class="upload-zone" id="uploadZone">
+            <div class="upload-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+            </div>
+            <div class="upload-title">Drag &amp; drop your spectrum photograph</div>
+            <div class="upload-desc">or click Browse above to select a file</div>
+            <div class="upload-formats">Supported: JPG · JPEG · PNG &nbsp;|&nbsp; Max: 15 MB</div>
+          </div>
+
+          <!-- Image preview panel (interactive editor) -->
+          <div class="image-preview-panel" id="imagePreviewPanel">
+
+            <!-- Workflow Steps Indicator -->
+            <div class="editor-workflow">
+              <div class="wf-step completed" id="wfStep1"><span class="wf-num">1</span> Upload Image</div>
+              <span class="wf-sep">›</span>
+              <div class="wf-step" id="wfStep2"><span class="wf-num">2</span> Crop Image (optional)</div>
+              <span class="wf-sep">›</span>
+              <div class="wf-step active" id="wfStep3"><span class="wf-num">3</span> Select Spectrum</div>
+              <span class="wf-sep">›</span>
+              <div class="wf-step" id="wfStep4"><span class="wf-num">4</span> Analyse</div>
+              <span class="wf-sep">›</span>
+              <div class="wf-step" id="wfStep5"><span class="wf-num">5</span> View Results</div>
+            </div>
+
+            <!-- Header with filename and actions -->
+            <div class="preview-header">
+              <div>
+                <div style="font-size:0.82rem;font-weight:600;color:var(--text-primary)" id="previewFilename">—</div>
+                <div class="preview-meta" id="previewMeta">—</div>
+              </div>
+              <div class="preview-actions">
+                <label for="fileInput" class="btn btn-sm btn-secondary" style="cursor:pointer;" title="Upload a different photograph">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  Replace Image
+                </label>
+                <button class="btn btn-sm btn-ghost" id="removeImageBtn" title="Remove image">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                  Remove
+                </button>
+              </div>
+            </div>
+
+            <!-- Editor Toolbar: Crop and Spectrum Tools -->
+            <div class="editor-toolbar">
+              <div class="tool-switch-group">
+                <button class="btn btn-sm active-tool" id="toolSelectSpectrumBtn" title="Select rainbow spectrum for pixel analysis">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 10 10"/></svg>
+                  Select Spectrum Region
+                </button>
+                <button class="btn btn-sm" id="toolCropBtn" title="Crop image to remove unwanted areas">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/></svg>
+                  Crop Image
+                </button>
+              </div>
+
+              <!-- Action group when in Crop Mode -->
+              <div class="tool-actions-group" id="cropActionGroup" style="display:none;">
+                <button class="btn btn-sm btn-emerald" id="applyCropBtn" title="Apply crop to working image">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                  Apply Crop
+                </button>
+                <button class="btn btn-sm btn-ghost" id="cancelCropBtn" title="Cancel cropping">Cancel</button>
+                <button class="btn btn-sm btn-ghost" id="resetOriginalBtn" title="Revert to original uploaded photograph">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                  Reset to Original
+                </button>
+              </div>
+
+              <!-- Action group when in Spectrum Mode -->
+              <div class="tool-actions-group" id="spectrumActionGroup">
+                <button class="btn btn-sm btn-ghost" id="rotateImageBtn" title="Rotate image 90° clockwise (useful for vertical phone photos)">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                  Rotate 90°
+                </button>
+                <button class="btn btn-sm btn-ghost" id="resetRegionBtn" title="Reset selection box to default band">
+                  Reset Region
+                </button>
+                <button class="btn btn-sm btn-secondary" id="revertCroppedImageBtn" style="display:none;" title="Restore original photograph before crop">
+                  Revert Crop
+                </button>
+              </div>
+            </div>
+
+            <!-- Helpful tip banner -->
+            <div class="editor-tip" id="editorTip">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              <span id="editorTipText">Drag the box or its handles to enclose only the rainbow spectrum. Only pixels inside the box are analysed.</span>
+            </div>
+
+            <!-- Canvas & Interactive 2D Selection Overlay -->
+            <div class="canvas-wrapper" id="canvasWrapper">
+              <canvas id="previewCanvas"></canvas>
+              <div class="selection-overlay" id="selectionOverlay">
+                <!-- 4 Dim masks outside the active selection box -->
+                <div class="dim-mask" id="maskTop"></div>
+                <div class="dim-mask" id="maskBottom"></div>
+                <div class="dim-mask" id="maskLeft"></div>
+                <div class="dim-mask" id="maskRight"></div>
+
+                <!-- Active Selection Box -->
+                <div class="selection-box mode-spectrum" id="selectionBox">
+                  <div class="selection-badge" id="selectionBadge">Spectrum Region</div>
+                  <!-- 8 Draggable Handles -->
+                  <div class="handle handle-tl" data-handle="tl"></div>
+                  <div class="handle handle-tr" data-handle="tr"></div>
+                  <div class="handle handle-bl" data-handle="bl"></div>
+                  <div class="handle handle-br" data-handle="br"></div>
+                  <div class="handle handle-t"  data-handle="t"></div>
+                  <div class="handle handle-b"  data-handle="b"></div>
+                  <div class="handle handle-l"  data-handle="l"></div>
+                  <div class="handle handle-r"  data-handle="r"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Region Coordinates and Peak Sensitivity -->
+            <div class="region-controls">
+              <div class="region-coord-info">
+                <span class="coord-label">Selected Region:</span>
+                <span class="coord-val" id="coordVal">X: 0–0 px · Y: 0–0 px (0 × 0 px)</span>
+              </div>
+              <div class="region-control-group">
+                <span class="region-label">Peak Sensitivity:</span>
+                <input type="range" class="range-input" id="peakThreshRange" min="5" max="50" value="15">
+                <span class="range-value" id="peakThreshVal">15</span>
+              </div>
+            </div>
+
+            <!-- Analyse Bar -->
+            <div class="analyse-bar">
+              <div class="region-control-group">
+                <span class="region-label" style="font-size:0.75rem;">Source label:</span>
+                <input type="text" id="sourceLabelInput" placeholder="e.g. LED, CFL, Sunlight" style="background:var(--bg-input);border:1px solid var(--border-medium);color:var(--text-primary);border-radius:var(--radius-sm);padding:7px 12px;font-size:0.78rem;outline:none;width:190px;">
+              </div>
+              <button class="btn btn-primary btn-lg" id="analyseBtn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                Analyse Selected Region
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stat cards -->
+        <div class="stat-cards" id="statCards">
+          <div class="stat-card">
+            <div class="stat-label">Pixels Analysed</div>
+            <div class="stat-value accent" id="statPixels">—</div>
+            <div class="stat-sub">columns × rows</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Peak Brightness</div>
+            <div class="stat-value cyan" id="statPeakBrightness">—</div>
+            <div class="stat-sub">normalised 0–100</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Peaks Detected</div>
+            <div class="stat-value emerald" id="statPeaks">—</div>
+            <div class="stat-sub">local maxima</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Brightest Column</div>
+            <div class="stat-value amber" id="statBrightestCol">—</div>
+            <div class="stat-sub">pixel position (x)</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Region Size</div>
+            <div class="stat-value" id="statRegion">—</div>
+            <div class="stat-sub">width × height px</div>
+          </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="chart-grid">
+          <div class="chart-card full-width">
+            <div class="chart-title-row">
+              <div>
+                <div class="chart-title">Relative Brightness Profile</div>
+                <div class="chart-sub">Luminance Y = 0.2126R + 0.7152G + 0.0722B, normalised 0–100 | Peaks marked ▲</div>
+              </div>
+              <div class="chart-actions">
+                <button class="btn btn-ghost btn-sm btn-icon" id="downloadBrightnessChart" data-tip="Download as PNG" title="Download PNG" disabled>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="chart-container">
+              <div class="chart-empty" id="emptyBrightness">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                <span>Upload an image and click <strong>Analyse Spectrum</strong> to generate the brightness profile</span>
+              </div>
+              <canvas id="brightnessChart" style="display:none;"></canvas>
+            </div>
+          </div>
+
+          <div class="chart-card full-width">
+            <div class="chart-title-row">
+              <div>
+                <div class="chart-title">RGB Channel Analysis</div>
+                <div class="chart-sub">Average red, green, blue channel intensity per pixel column (0–255)</div>
+              </div>
+              <div class="chart-actions">
+                <button class="btn btn-ghost btn-sm btn-icon" id="downloadRGBChart" data-tip="Download as PNG" title="Download PNG" disabled>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="chart-container">
+              <div class="chart-empty" id="emptyRGB">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                <span>RGB channel chart appears here after analysis</span>
+              </div>
+              <canvas id="rgbChart" style="display:none;"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Calibration -->
+        <div class="calibration-panel" id="calibrationPanel">
+          <div class="card-header" style="margin-bottom:12px;">
+            <div class="card-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="5" x2="6" y2="19"/><circle cx="7" cy="6" r="3"/><circle cx="17" cy="18" r="3"/></svg>
+              Optional Wavelength Calibration
+            </div>
+            <span class="badge badge-amber">Optional</span>
+          </div>
+          <div class="alert alert-warn" style="font-size:0.72rem;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <div>Calibration requires you to identify known spectral lines and their pixel positions. Without calibration, all graphs show pixel position (not wavelength). The CD/DVD geometry may produce non-linear dispersion. Enter at least 2 calibration points.</div>
+          </div>
+
+          <div class="calibration-inputs" id="calibInputs">
+            <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:10px;font-size:0.68rem;color:var(--text-muted);font-weight:600;padding:0 2px;">
+              <span>Pixel position (x)</span>
+              <span>Known wavelength (nm)</span>
+              <span></span>
+            </div>
+            <div class="calib-row" data-row="0">
+              <input class="form-input calib-px" type="number" placeholder="e.g. 120" min="0" />
+              <input class="form-input calib-wl" type="number" placeholder="e.g. 488 (blue)" min="380" max="750" />
+              <button class="btn btn-ghost btn-sm btn-icon calib-remove-btn" title="Remove row" disabled>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <div class="calib-row" data-row="1">
+              <input class="form-input calib-px" type="number" placeholder="e.g. 380" min="0" />
+              <input class="form-input calib-wl" type="number" placeholder="e.g. 546 (green)" min="380" max="750" />
+              <button class="btn btn-ghost btn-sm btn-icon calib-remove-btn" title="Remove row" disabled>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px;">
+            <button class="btn btn-secondary btn-sm" id="addCalibRow">+ Add point</button>
+            <button class="btn btn-primary btn-sm" id="applyCalibBtn">Apply Calibration</button>
+            <button class="btn btn-ghost btn-sm" id="clearCalibBtn">Clear</button>
+          </div>
+
+          <div class="calib-status" id="calibStatus"></div>
+
+          <!-- Calibrated chart -->
+          <div id="calibChartWrapper" style="display:none;margin-top:16px;">
+            <div class="chart-title-row">
+              <div>
+                <div class="chart-title">Wavelength-Calibrated Spectrum</div>
+                <div class="chart-sub" id="calibEquationDisplay"></div>
+              </div>
+              <button class="btn btn-ghost btn-sm btn-icon" id="downloadCalibChart" title="Download PNG" disabled>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              </button>
+            </div>
+            <div class="chart-container">
+              <canvas id="calibChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+      </section><!-- /view-analysis -->
+
+
+      <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░
+           VIEW: COMPARE
+      ░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+      <section class="view" id="view-compare">
+        <div class="spectrum-bar" style="margin-bottom:20px;"></div>
+        <h2 class="section-title">Compare Two Light Sources</h2>
+        <p class="section-desc">Upload two spectrum photographs to overlay their brightness profiles. Labels are assigned by you; the app compares measured pixel brightness only.</p>
+
+        <div class="alert alert-info" style="margin-bottom:18px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div>Comparison is based on pixel brightness in the selected region. If the two photographs have different exposure settings, zoom levels, or framing, differences in brightness may reflect image conditions rather than physical light intensity.</div>
+        </div>
+
+        <div class="compare-grid">
+          <!-- Source A -->
+          <div class="compare-slot">
+            <div class="compare-slot-label">Source A</div>
+            <input type="text" class="source-name-input" id="sourceAName" placeholder="Source label (e.g. LED)" value="Source A" />
+            <div class="mini-upload" id="uploadA">
+              <div>Click to upload spectrum photograph</div>
+              <div style="font-size:0.65rem;color:var(--text-muted);margin-top:4px;">JPG · PNG</div>
+            </div>
+            <input type="file" id="fileInputA" accept=".jpg,.jpeg,.png" style="display:none;" />
+            <canvas class="mini-preview-canvas" id="previewA" style="display:none;width:100%;max-height:120px;object-fit:contain;"></canvas>
+            <div style="margin-top:8px;display:none;" id="controlsA">
+              <div class="region-control-group" style="gap:8px;flex-wrap:wrap;">
+                <span class="region-label">Top %</span>
+                <input type="range" class="range-input" id="selTopA" min="0" max="90" value="30">
+                <span class="range-value" id="selTopAVal">30%</span>
+                <span class="region-label">Height %</span>
+                <input type="range" class="range-input" id="selHeightA" min="5" max="70" value="40">
+                <span class="range-value" id="selHeightAVal">40%</span>
+              </div>
+              <div class="preview-meta" id="metaA" style="margin-top:6px;"></div>
+            </div>
+          </div>
+
+          <!-- Source B -->
+          <div class="compare-slot">
+            <div class="compare-slot-label">Source B</div>
+            <input type="text" class="source-name-input" id="sourceBName" placeholder="Source label (e.g. CFL)" value="Source B" />
+            <div class="mini-upload" id="uploadB">
+              <div>Click to upload spectrum photograph</div>
+              <div style="font-size:0.65rem;color:var(--text-muted);margin-top:4px;">JPG · PNG</div>
+            </div>
+            <input type="file" id="fileInputB" accept=".jpg,.jpeg,.png" style="display:none;" />
+            <canvas class="mini-preview-canvas" id="previewB" style="display:none;width:100%;max-height:120px;object-fit:contain;"></canvas>
+            <div style="margin-top:8px;display:none;" id="controlsB">
+              <div class="region-control-group" style="gap:8px;flex-wrap:wrap;">
+                <span class="region-label">Top %</span>
+                <input type="range" class="range-input" id="selTopB" min="0" max="90" value="30">
+                <span class="range-value" id="selTopBVal">30%</span>
+                <span class="region-label">Height %</span>
+                <input type="range" class="range-input" id="selHeightB" min="5" max="70" value="40">
+                <span class="range-value" id="selHeightBVal">40%</span>
+              </div>
+              <div class="preview-meta" id="metaB" style="margin-top:6px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="text-align:center;margin-bottom:18px;">
+          <button class="btn btn-primary" id="compareBtn" disabled>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            Compare Spectra
+          </button>
+        </div>
+
+        <!-- Comparison chart -->
+        <div class="chart-card" id="compareChartCard" style="display:none;">
+          <div class="chart-title-row">
+            <div>
+              <div class="chart-title">Brightness Profile Comparison</div>
+              <div class="chart-sub">Normalised relative brightness (0–100) vs pixel position</div>
+            </div>
+            <button class="btn btn-ghost btn-sm btn-icon" id="downloadCompareChart" title="Download PNG">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </button>
+          </div>
+          <div class="chart-container">
+            <canvas id="compareChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Comparison summary -->
+        <div class="compare-summary" id="compareSummary" style="display:none;">
+          <div class="obs-title">Comparison Summary</div>
+          <div id="compareSummaryText" style="font-size:0.76rem;color:var(--text-secondary);line-height:1.8;"></div>
+        </div>
+
+      </section><!-- /view-compare -->
+
+
+      <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░
+           VIEW: RESULTS & EXPORT
+      ░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+      <section class="view" id="view-results">
+        <div class="spectrum-bar" style="margin-bottom:20px;"></div>
+        <h2 class="section-title">Results &amp; Export</h2>
+        <p class="section-desc">Review your analysis results, observations, and methodology. Export data for your lab report.</p>
+
+        <!-- No results placeholder -->
+        <div class="card" id="noResultsCard" style="text-align:center;padding:48px;">
+          <div style="color:var(--text-muted);margin-bottom:12px;">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" style="margin:auto;display:block;opacity:0.4;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div style="font-size:0.9rem;font-weight:600;color:var(--text-secondary);margin-bottom:6px;">No analysis results yet</div>
+          <div style="font-size:0.76rem;color:var(--text-muted);">Upload an image in the Spectrum Analysis tab and click Analyse Spectrum.</div>
+          <button class="btn btn-primary btn-sm" style="margin-top:16px;" onclick="switchView('analysis')">Go to Analysis</button>
+        </div>
+
+        <!-- Results panel (shown after analysis) -->
+        <div id="resultsPanel" style="display:none;">
+          <div class="demo-banner" id="demoBannerResults">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <strong>ILLUSTRATIVE DEMO DATA — NOT A REAL EXPERIMENTAL MEASUREMENT.</strong>
+          </div>
+
+          <div class="results-grid">
+            <!-- Left sidebar -->
+            <div class="results-sidebar-panel">
+              <div class="card" id="resultImageCard">
+                <div class="card-title" style="margin-bottom:12px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                  Source Image
+                </div>
+                <canvas id="resultThumb" style="width:100%;border-radius:6px;"></canvas>
+                <div style="margin-top:10px;">
+                  <div style="font-size:0.7rem;color:var(--text-muted);">Source</div>
+                  <div style="font-size:0.82rem;color:var(--text-primary);font-weight:600;" id="resultSourceLabel">—</div>
+                </div>
+                <div style="margin-top:8px;">
+                  <div style="font-size:0.7rem;color:var(--text-muted);">Calibration</div>
+                  <div style="font-size:0.78rem;" id="resultCalibStatus"><span class="badge badge-amber">Uncalibrated</span></div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-title" style="margin-bottom:12px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                  Analysis Summary
+                </div>
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                  <div class="obs-item"><div class="obs-dot"></div><span id="rPixels">—</span></div>
+                  <div class="obs-item"><div class="obs-dot"></div><span id="rPeakBrightness">—</span></div>
+                  <div class="obs-item"><div class="obs-dot"></div><span id="rPeaks">—</span></div>
+                  <div class="obs-item"><div class="obs-dot"></div><span id="rRegion">—</span></div>
+                </div>
+              </div>
+
+              <!-- Export actions -->
+              <div class="card">
+                <div class="card-title" style="margin-bottom:12px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Export
+                </div>
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                  <button class="btn btn-primary btn-sm" id="exportCSVBtn">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    Download CSV
+                  </button>
+                  <button class="btn btn-secondary btn-sm" id="exportBrightnessBtn">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+                    Brightness Chart PNG
+                  </button>
+                  <button class="btn btn-secondary btn-sm" id="exportRGBBtn">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+                    RGB Chart PNG
+                  </button>
+                  <button class="btn btn-ghost btn-sm" id="printReportBtn">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                    Print Report
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Main results -->
+            <div class="results-main">
+              <div class="observations-box">
+                <div class="obs-title">Automated Observations</div>
+                <div id="observationsList"></div>
+              </div>
+
+              <div class="limitations-box">
+                <div class="lim-title">⚠ Scientific Limitations &amp; Caveats</div>
+                <div class="lim-item"><div class="lim-dot"></div><span>Results represent relative image brightness, not absolute physical light intensity.</span></div>
+                <div class="lim-item"><div class="lim-dot"></div><span>Camera response curves, exposure settings, and JPEG compression affect channel intensities.</span></div>
+                <div class="lim-item"><div class="lim-dot"></div><span>CD/DVD groove spacing produces non-linear wavelength dispersion; pixel position ≠ wavelength without calibration.</span></div>
+                <div class="lim-item"><div class="lim-dot"></div><span>Reflections, ambient light, and spectroscope alignment affect the measured spectrum shape.</span></div>
+                <div class="lim-item"><div class="lim-dot"></div><span>Detected peaks may be artefacts of image noise or reflections, not actual spectral lines.</span></div>
+              </div>
+
+              <div class="methodology-section">
+                <div class="card-title" style="margin-bottom:10px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                  Methodology
+                </div>
+                <div class="methodology-text">
+1. IMAGE LOADING: Photograph uploaded and decoded into an HTML &lt;canvas&gt; element.
+   No data is sent to any server; all processing is in-browser (client-side only).
+
+2. REGION SELECTION: User selects a horizontal band (adjustable top % and height %)
+   corresponding to the visible spectrum in the photograph.
+
+3. PIXEL EXTRACTION: For each vertical column x in the selected region,
+   all pixel RGBA values at rows y ∈ [y_top, y_top+height] are read
+   using CanvasRenderingContext2D.getImageData().
+
+4. CHANNEL AVERAGING: For each column x:
+     R(x) = mean of red channel across all rows in the band
+     G(x) = mean of green channel across all rows in the band
+     B(x) = mean of blue channel across all rows in the band
+
+5. LUMINANCE FORMULA (ITU-R BT.709):
+     Y(x) = 0.2126 × R(x) + 0.7152 × G(x) + 0.0722 × B(x)
+   This weights the channels by the human eye's sensitivity to each colour.
+
+6. NORMALISATION: Y values are scaled linearly so that the maximum
+   value in the profile equals 100 and the minimum equals 0.
+
+7. PEAK DETECTION: Local maxima are identified where:
+   - The value exceeds the user-set threshold (default: 15 above baseline).
+   - Adjacent peaks are separated by at least 8 pixel columns.
+   - Peak prominence is checked to reduce noise detections.
+
+8. CALIBRATION (optional): If ≥2 calibration points are provided,
+   a linear regression maps pixel position x to wavelength λ (nm).
+   The fitted equation λ = a·x + b is displayed. Nonlinearity is noted.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section><!-- /view-results -->
+
+
+      <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░
+           VIEW: PHYSICS & THEORY
+      ░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+      <section class="view" id="view-physics">
+        <div class="spectrum-bar" style="margin-bottom:20px;"></div>
+        <h2 class="section-title">Physics &amp; Diffraction Theory</h2>
+        <p class="section-desc">Core diffraction grating principles, dispersion equations, pixel analysis methodology, and experimental limitations.</p>
+
+        <!-- Concepts grid -->
+        <div class="physics-grid">
+
+          <div class="physics-card">
+            <div class="physics-card-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              What is a Spectroscope?
+            </div>
+            <p class="physics-text">
+              A spectroscope is an optical instrument that separates light into its constituent wavelengths
+              (its spectrum). It uses either a prism or a diffraction grating to spread different wavelengths
+              at different angles. Our DIY version uses a cardboard tube with a narrow entrance slit and an
+              old CD/DVD as the dispersing element. When you look through (or photograph) the CD end while
+              illuminating the slit, you see the rainbow spectrum of the light source.
+            </p>
+          </div>
+
+          <div class="physics-card">
+            <div class="physics-card-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg>
+              How a CD/DVD Separates Light
+            </div>
+            <p class="physics-text">
+              A CD has about 1,600 grooves per millimetre etched into its polycarbonate surface — a
+              diffraction grating. When light strikes these grooves, each groove acts as a secondary wave
+              source. For a particular wavelength λ, constructive interference occurs at angles θ satisfying
+              the grating equation <em>d sin θ = mλ</em>, where d is the groove spacing and m is the
+              diffraction order (usually m = 1 for the first-order spectrum). Since sin θ differs for each λ,
+              different colours fan out at different angles, producing the visible spectrum.
+            </p>
+          </div>
+
+          <div class="physics-card">
+            <div class="physics-card-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+              Diffraction &amp; Interference
+            </div>
+            <p class="physics-text">
+              <strong>Diffraction</strong> is the bending and spreading of waves when they pass through a
+              narrow opening or around an obstacle. <strong>Interference</strong> is what happens when two or
+              more waves overlap — they add up (constructive) where crests meet, or cancel (destructive)
+              where a crest meets a trough. The grating produces a bright spot at angles where contributions
+              from all grooves arrive exactly in phase (path difference = whole number of wavelengths).
+              This is why specific colours appear at specific angles.
+            </p>
+          </div>
+
+          <div class="physics-card">
+            <div class="physics-card-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              Wavelength &amp; the Visible Spectrum
+            </div>
+            <div class="wavelength-bar">
+              <div class="wl-segment" style="background:#7c3aed;">V</div>
+              <div class="wl-segment" style="background:#4338ca;">I</div>
+              <div class="wl-segment" style="background:#2563eb;">B</div>
+              <div class="wl-segment" style="background:#0891b2;">C</div>
+              <div class="wl-segment" style="background:#059669;">G</div>
+              <div class="wl-segment" style="background:#d97706;">Y</div>
+              <div class="wl-segment" style="background:#ea580c;">O</div>
+              <div class="wl-segment" style="background:#dc2626;">R</div>
+            </div>
+            <p class="physics-text" style="font-size:0.7rem;">
+              Violet ≈ 380–450 nm · Blue ≈ 450–495 nm · Green ≈ 495–570 nm ·
+              Yellow ≈ 570–590 nm · Orange ≈ 590–620 nm · Red ≈ 620–750 nm.
+              Human eyes are most sensitive to green (~555 nm). Wavelength λ is related
+              to frequency f and the speed of light c by λ = c / f.
+            </p>
+          </div>
+
+          <div class="physics-card">
+            <div class="physics-card-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              Types of Spectra
+            </div>
+            <p class="physics-text">
+              <strong>Continuous spectrum:</strong> A smooth, unbroken rainbow of all visible wavelengths.
+              Produced by hot incandescent solids (e.g., an old filament bulb). <br/><br/>
+              <strong>Line spectrum (emission):</strong> Bright coloured lines on a dark background.
+              Specific wavelengths only, unique to each element (e.g., sodium's yellow doublet). Produced by
+              excited low-pressure gas (e.g., neon signs, CFL tubes at lower pressure). <br/><br/>
+              <strong>Band spectrum:</strong> Groups of closely spaced lines (molecular spectra). Produced
+              by molecules rather than individual atoms.
+            </p>
+          </div>
+
+          <div class="physics-card">
+            <div class="physics-card-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+              From Image Pixels to Data
+            </div>
+            <p class="physics-text">
+              Every digital photograph stores colour as a grid of pixels. Each pixel has three 8-bit
+              channel values: Red (0–255), Green (0–255), Blue (0–255). The HTML Canvas API lets
+              JavaScript read every pixel's RGB values directly. By averaging all pixel rows in the
+              selected band for each column, we get a brightness profile across the spectrum. The
+              luminance formula Y = 0.2126R + 0.7152G + 0.0722B mimics the human eye's response,
+              giving more weight to green (where our eyes are most sensitive).
+            </p>
+          </div>
+
+          <div class="physics-card">
+            <div class="physics-card-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="5" x2="6" y2="19"/><circle cx="7" cy="6" r="3"/><circle cx="17" cy="18" r="3"/></svg>
+              Wavelength Calibration
+            </div>
+            <p class="physics-text">
+              To convert pixel positions to wavelengths, you need to identify at least two known spectral
+              features and their pixel positions in the image. For example, if you observe sodium's yellow
+              doublet at ~589 nm and mercury's green line at ~546 nm, you can fit a linear equation
+              λ = a·x + b. This converts any pixel x to an approximate wavelength λ. Accuracy depends
+              on how well your calibration points are identified and how linear the dispersion actually is
+              (the CD grating can introduce nonlinear effects).
+            </p>
+          </div>
+
+          <div class="physics-card">
+            <div class="physics-card-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+              Limitations &amp; Experimental Errors
+            </div>
+            <p class="physics-text">
+              <strong>Geometric distortion:</strong> CD grooves are circular; a flat photograph introduces
+              mapping errors. <strong>Camera effects:</strong> Sensors saturate, auto-white-balance modifies
+              colour ratios, JPEG compression loses detail. <strong>Alignment:</strong> If the slit is not
+              perpendicular to the grating grooves, the spectrum tilts. <strong>Ambient light:</strong>
+              Background illumination adds a constant brightness offset. <strong>Quantisation:</strong>
+              8-bit channel depth (256 levels) limits precision. These limitations mean our results are
+              qualitative, not primary measurement standards.
+            </p>
+          </div>
+
+        </div>
+
+
+      </section><!-- /view-physics -->
+
+    </main><!-- /main-content -->
+  </div><!-- /main-content -->
+</div><!-- /app-shell -->
+
+<!-- Toast container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<!-- App JS -->
+<script src="app.js"></script>
+</body>
+</html>
